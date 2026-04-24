@@ -1,275 +1,901 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ErgoSalud - Evaluación de Riesgo</title>
-    <style>
-        /* =========================================
-           ESTILOS VISUALES (DISEÑO CON COLOR)
-           ========================================= */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Inicio de Tratamiento HELSE</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+:root{--bg:#f4f1ec;--white:#fff;--dark:#1a1a2e;--dark2:#16213e;--red:#8b1a1a;--red2:#b02020;--accent:#e8a020;--green:#1a7a4a;--green-l:#d4edda;--yellow:#fff8e1;--yellow-b:#ffc107;--border:#ddd5c8;--text:#2c2c2c;--muted:#888;--r:13px;--sh:0 4px 20px rgba(0,0,0,.09);}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
 
-        /* Fondo principal con degradado sutil */
-        body {
-            background: linear-gradient(135deg, #e0f7fa 0%, #e8eaf6 50%, #fce4ec 100%);
-            min-height: 100vh;
-            color: #333;
-        }
+/* LOGIN */
+#loginScreen{display:flex;align-items:center;justify-content:center;min-height:100vh;background:linear-gradient(135deg,var(--dark) 0%,#2a1a1a 100%);}
+.login-box{background:white;border-radius:20px;padding:40px 36px;width:100%;max-width:400px;box-shadow:0 24px 80px rgba(0,0,0,.4);animation:fadeUp .4s ease;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
+.login-logo{text-align:center;margin-bottom:28px;}
+.login-logo-icon{width:64px;height:64px;background:var(--red);border-radius:16px;display:inline-grid;place-items:center;font-size:32px;box-shadow:0 8px 24px rgba(139,26,26,.35);margin-bottom:12px;}
+.login-title{font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:var(--dark);}
+.login-brand{font-family:'Syne',sans-serif;font-weight:700;color:var(--red);font-size:16px;margin-top:2px;}
+.login-sub{font-size:12px;color:var(--muted);margin-top:4px;}
+.login-error{background:#fee;color:#c0392b;border-radius:8px;padding:10px 14px;font-size:13px;margin-bottom:12px;display:none;}
 
-        /* Cabecera con degradado fuerte */
-        .presentacion {
-            background: linear-gradient(135deg, #00b4d8, #0077b6);
-            color: white;
-            padding: 40px 20px;
-            text-align: center;
-            box-shadow: 0 4px 15px rgba(0, 119, 182, 0.3);
-        }
+/* FORM */
+.form-group{margin-bottom:16px;}
+.form-label{display:block;font-size:11px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;color:var(--muted);margin-bottom:6px;}
+.req{color:var(--red2);margin-left:2px;}
+.form-input{width:100%;padding:11px 14px;border:1.5px solid var(--border);border-radius:9px;font-family:'Outfit',sans-serif;font-size:14px;color:var(--text);background:white;outline:none;transition:border-color .2s;}
+.form-input:focus{border-color:var(--red);}
+.form-input.error{border-color:#ef4444;background:#fff5f5;}
 
-        .presentacion h1 {
-            font-size: 2.8em;
-            margin-bottom: 20px;
-            color: #ffffff;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
-            letter-spacing: 1px;
-        }
+/* BUTTONS */
+.btn{padding:11px;background:var(--red);color:white;border:none;border-radius:9px;font-family:'Syne',sans-serif;font-size:14px;font-weight:700;cursor:pointer;transition:all .2s;width:100%;}
+.btn:hover{background:var(--red2);transform:translateY(-1px);box-shadow:0 4px 16px rgba(139,26,26,.3);}
+.btn:disabled{opacity:.45;cursor:not-allowed;transform:none;box-shadow:none;}
+.btn.green{background:var(--green)!important;}
+.btn.green:hover{background:#145a38!important;}
+.btn.dark{background:var(--dark)!important;}
+.btn.sm{width:auto;padding:7px 14px;font-size:12px;background:white;color:var(--text);border:1.5px solid var(--border);}
+.btn.sm:hover{border-color:var(--red);color:var(--red);transform:none;box-shadow:none;}
 
-        .info-proyecto {
-            background-color: rgba(255,255,255,0.15);
-            backdrop-filter: blur(5px);
-            padding: 25px;
-            border-radius: 15px;
-            text-align: left;
-            max-width: 900px;
-            margin: 0 auto;
-            line-height: 1.8;
-            border: 1px solid rgba(255,255,255,0.3);
-        }
+/* APP SHELL */
+#appShell{display:none;}
+.header{background:var(--dark);height:60px;display:flex;align-items:center;justify-content:space-between;padding:0 24px;position:sticky;top:0;z-index:200;box-shadow:0 2px 16px rgba(0,0,0,.25);}
+.hbrand{display:flex;align-items:center;gap:12px;}
+.hlogo{width:34px;height:34px;background:var(--red);border-radius:9px;display:grid;place-items:center;font-size:18px;border:2px solid var(--accent);}
+.htitle{font-family:'Syne',sans-serif;font-size:16px;font-weight:800;color:white;}
+.htitle span{color:var(--accent);}
+.hright{display:flex;align-items:center;gap:12px;}
+.uchip{display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.08);padding:6px 12px;border-radius:20px;}
+.uavatar{width:26px;height:26px;border-radius:50%;background:var(--red);display:grid;place-items:center;font-size:12px;font-weight:700;color:white;}
+.uname{font-size:13px;color:rgba(255,255,255,.85);font-weight:500;}
+.urole{font-size:10px;color:var(--accent);font-weight:600;text-transform:uppercase;}
+.btn-logout{padding:6px 14px;border-radius:8px;border:1.5px solid rgba(255,255,255,.15);background:transparent;color:rgba(255,255,255,.6);font-size:12px;cursor:pointer;transition:all .2s;}
+.btn-logout:hover{border-color:rgba(255,255,255,.4);color:white;}
 
-        .info-proyecto strong {
-            color: #90e0ef;
-        }
+/* NAV */
+.nav{background:var(--white);border-bottom:1px solid var(--border);display:flex;padding:0 24px;overflow-x:auto;}
+.nitem{padding:14px 18px;font-size:13px;font-weight:600;color:var(--muted);border-bottom:2.5px solid transparent;cursor:pointer;white-space:nowrap;transition:all .2s;}
+.nitem.active{color:var(--red);border-bottom-color:var(--red);}
+.nitem:hover:not(.active){color:var(--text);}
 
-        /* Contenedor principal (Tarjeta blanca) */
-        .app-container {
-            max-width: 850px;
-            margin: 40px auto;
-            background: #ffffff;
-            padding: 40px;
-            border-radius: 20px;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.08);
-            border-top: 6px solid #0077b6;
-        }
+/* PAGES */
+.page{display:none;padding:26px 28px;max-width:1300px;margin:0 auto;}
+.page.active{display:block;}
 
-        h2 {
-            text-align: center;
-            margin-bottom: 30px;
-            color: #023e8a;
-            font-size: 1.8em;
-        }
+/* SECTION TITLE */
+.stitle{font-family:'Syne',sans-serif;font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--red);margin-bottom:14px;}
 
-        /* Diseño de las preguntas */
-        .pregunta {
-            margin-bottom: 25px;
-            background: #f8f9fa;
-            padding: 20px;
-            border-left: 6px solid #00b4d8;
-            border-radius: 8px;
-            transition: all 0.3s ease;
-        }
+/* CARD */
+.card{background:white;border-radius:var(--r);border:1.5px solid var(--border);box-shadow:var(--sh);padding:22px;margin-bottom:16px;}
 
-        .pregunta:hover {
-            transform: translateX(8px);
-            box-shadow: 0 5px 15px rgba(0, 180, 216, 0.15);
-            background-color: #ffffff;
-        }
+/* GRIDS */
+.g2{display:grid;grid-template-columns:360px 1fr;gap:24px;}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;}
 
-        .pregunta label:first-child {
-            font-weight: bold;
-            display: block;
-            margin-bottom: 12px;
-            font-size: 1.1em;
-            color: #333;
-        }
+/* STAT */
+.stat{background:white;border-radius:var(--r);border:1.5px solid var(--border);padding:18px;box-shadow:var(--sh);}
+.snum{font-family:'Syne',sans-serif;font-size:32px;font-weight:800;color:var(--red);}
+.slbl{font-size:12px;color:var(--muted);font-weight:500;margin-top:2px;}
 
-        /* Opciones (Radio buttons invisibles pero con color al pasar el mouse) */
-        .opciones label {
-            display: block;
-            margin-bottom: 8px;
-            padding: 8px 12px;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
+/* UPLOAD */
+.upload-zone{border:2px dashed var(--border);border-radius:var(--r);padding:30px 20px;text-align:center;cursor:pointer;transition:all .2s;background:#fafaf8;margin-bottom:16px;}
+.upload-zone:hover,.upload-zone.drag{border-color:var(--red);background:#fff5f5;}
+.ui{font-size:34px;margin-bottom:8px;}
+.ut{font-size:14px;font-weight:500;margin-bottom:3px;}
+.us{font-size:11px;color:var(--muted);}
 
-        .opciones label:hover {
-            background-color: #e0f7fa;
-        }
+/* EXTRACTED */
+.extracted{background:var(--dark);border-radius:var(--r);padding:16px;margin-bottom:14px;display:none;}
+.extracted.on{display:block;animation:fadeUp .3s ease;}
+.exh{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+.exlbl{font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--accent);}
+.labbadge{background:var(--red);color:white;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;}
+.prow{background:rgba(255,255,255,.06);border-radius:8px;padding:9px 12px;margin-bottom:5px;display:flex;justify-content:space-between;align-items:center;}
+.pname{font-size:12px;font-weight:500;color:white;}
+.pqty{font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:var(--accent);}
+.punit{font-size:10px;color:rgba(232,160,32,.6);}
 
-        /* Botón con degradado y efecto 3D */
-        button {
-            width: 100%;
-            padding: 18px;
-            background: linear-gradient(90deg, #00b4d8, #023e8a);
-            color: white;
-            border: none;
-            border-radius: 50px;
-            font-size: 1.3em;
-            font-weight: bold;
-            cursor: pointer;
-            margin-top: 20px;
-            transition: all 0.3s ease;
-            box-shadow: 0 5px 15px rgba(2, 62, 138, 0.2);
-        }
+/* LOADING */
+.lbar{height:3px;background:linear-gradient(90deg,var(--red),var(--accent),var(--red));background-size:200%;animation:ld 1.2s linear infinite;border-radius:2px;margin-bottom:10px;display:none;}
+.lbar.on{display:block;}
+@keyframes ld{0%{background-position:200% 0}100%{background-position:-200% 0}}
 
-        button:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 20px rgba(2, 62, 138, 0.4);
-        }
+/* PENDING CARDS */
+.pcard{background:white;border-radius:var(--r);border:1.5px solid var(--border);margin-bottom:12px;overflow:hidden;box-shadow:var(--sh);transition:transform .2s,box-shadow .2s;animation:fadeUp .3s ease;}
+.pcard:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(0,0,0,.12);}
+.ptop{padding:9px 14px;display:flex;align-items:center;justify-content:space-between;}
+.ptop.y{background:var(--yellow);border-bottom:1.5px solid #ffe08a;}
+.ptop.b{background:#e8f4fd;border-bottom:1.5px solid #bee3f8;}
+.ptop.g{background:var(--green-l);border-bottom:1.5px solid #a8d5b5;}
+.pbadge{display:flex;align-items:center;gap:6px;font-size:11px;font-weight:700;}
+.pbadge.y{color:#7a5c00;}
+.pbadge.b{color:#1a5276;}
+.pbadge.g{color:var(--green);}
+.dot{width:8px;height:8px;border-radius:50%;animation:pulse 1.5s infinite;}
+.dot.y{background:var(--yellow-b);}
+.dot.b{background:#3498db;}
+@keyframes pulse{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.5);opacity:.6}}
+.pbody{padding:13px 14px;}
+.igrid{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:10px;}
+.ilbl{font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-bottom:2px;}
+.ival{font-size:13px;font-weight:500;}
+.pbox{background:#f8f6f2;border-radius:8px;padding:9px 11px;margin-bottom:9px;}
+.pi{display:flex;justify-content:space-between;align-items:center;padding:4px 0;border-bottom:1px solid var(--border);font-size:12px;}
+.pi:last-child{border-bottom:none;}
+.piq{font-weight:700;color:var(--red);}
+.labtag{display:inline-flex;align-items:center;gap:4px;background:#f0e8e8;color:var(--red);border-radius:20px;padding:2px 8px;font-size:10px;font-weight:700;}
 
-        button:active {
-            transform: translateY(1px);
-        }
+/* MODAL */
+.mo{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:500;align-items:center;justify-content:center;padding:16px;}
+.mo.open{display:flex;}
+.modal{background:white;border-radius:18px;width:100%;max-width:480px;max-height:92vh;overflow-y:auto;box-shadow:0 24px 80px rgba(0,0,0,.35);animation:fadeUp .25s ease;}
+.mh{background:var(--dark);padding:17px 22px;border-radius:18px 18px 0 0;display:flex;align-items:center;justify-content:space-between;}
+.mt{font-family:'Syne',sans-serif;font-size:15px;font-weight:700;color:white;}
+.mc{width:28px;height:28px;background:rgba(255,255,255,.1);border:none;border-radius:7px;color:white;font-size:16px;cursor:pointer;display:grid;place-items:center;}
+.mb{padding:22px;}
 
-        /* Caja de resultados */
-        #resultado {
-            margin-top: 35px;
-            padding: 25px;
-            border-radius: 15px;
-            text-align: center;
-            transition: all 0.5s ease;
-        }
+/* STEPS */
+.steps{display:flex;gap:5px;margin-bottom:18px;}
+.sdot{flex:1;height:3px;background:var(--border);border-radius:2px;transition:background .3s;}
+.sdot.done{background:var(--green);}
+.sdot.cur{background:var(--red);}
+.dstep{display:none;}
+.dstep.on{display:block;}
 
-        .oculto {
-            display: none;
-        }
+/* SIGNATURE */
+.sigbox{border:2px solid var(--border);border-radius:10px;overflow:hidden;position:relative;background:#fafafa;margin-bottom:8px;}
+.sigph{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:13px;color:#ccc;pointer-events:none;transition:opacity .3s;}
+#signatureCanvas{display:block;width:100%;height:170px;cursor:crosshair;touch-action:none;}
 
-        #nivel-riesgo {
-            font-size: 1.8em;
-            font-weight: bold;
-            margin-bottom: 15px;
-        }
+/* REPORTS */
+.rfilters{display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end;margin-bottom:20px;}
+.fg{display:flex;flex-direction:column;gap:4px;}
+.flbl{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);}
+.fsel,.finp{padding:9px 12px;border:1.5px solid var(--border);border-radius:8px;font-family:'Outfit',sans-serif;font-size:13px;color:var(--text);background:white;outline:none;}
+.fsel:focus,.finp:focus{border-color:var(--red);}
+table{width:100%;border-collapse:collapse;}
+th{background:var(--dark);color:white;padding:9px 12px;text-align:left;font-size:10px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;}
+td{padding:9px 12px;font-size:12px;border-bottom:1px solid var(--border);}
+tr:hover td{background:#fafaf8;}
+.sbadge{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:700;}
+.sbadge.pendiente{background:var(--yellow);color:#7a5c00;}
+.sbadge.aceptado{background:#e8f4fd;color:#1a5276;}
+.sbadge.entregado{background:var(--green-l);color:var(--green);}
 
-        /* Colores vibrantes para los resultados */
-        .riesgo-bajo { 
-            background: linear-gradient(135deg, #d4edda, #c3e6cb); 
-            border: 2px solid #28a745; 
-            color: #155724;
-        }
-        .riesgo-medio { 
-            background: linear-gradient(135deg, #fff3cd, #ffeeba); 
-            border: 2px solid #ffc107; 
-            color: #856404;
-        }
-        .riesgo-alto { 
-            background: linear-gradient(135deg, #f8d7da, #f5c6cb); 
-            border: 2px solid #dc3545; 
-            color: #721c24;
-        }
-    </style>
+/* USERS */
+.urow{background:white;border-radius:var(--r);border:1.5px solid var(--border);padding:13px 16px;display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;box-shadow:var(--sh);}
+.uinfo{display:flex;align-items:center;gap:12px;}
+.uav{width:36px;height:36px;border-radius:50%;background:var(--red);display:grid;place-items:center;font-size:15px;font-weight:700;color:white;}
+.unam{font-size:14px;font-weight:600;}
+.uuser{font-size:12px;color:var(--muted);}
+.rpill{padding:3px 9px;border-radius:20px;font-size:10px;font-weight:700;}
+.rpill.superadmin{background:#f3e8ff;color:#6b21a8;}
+.rpill.admin{background:#fee2e2;color:var(--red);}
+.rpill.entregador{background:#d1fae5;color:var(--green);}
+
+/* DIVIDER */
+.div{height:1px;background:var(--border);margin:16px 0;}
+
+/* TOAST */
+.toast{position:fixed;bottom:22px;right:22px;background:var(--dark);color:white;padding:12px 18px;border-radius:11px;font-size:13px;font-weight:500;box-shadow:0 8px 30px rgba(0,0,0,.3);z-index:1000;transform:translateY(20px);opacity:0;transition:all .3s;max-width:290px;}
+.toast.show{transform:translateY(0);opacity:1;}
+.toast.ok{border-left:4px solid var(--green);}
+.toast.err{border-left:4px solid #ef4444;}
+
+/* EMPTY */
+.empty{text-align:center;padding:40px 20px;color:var(--muted);}
+.eico{font-size:44px;margin-bottom:10px;}
+
+/* CONFIRM */
+.cmodal{background:white;border-radius:16px;padding:28px;max-width:340px;width:100%;box-shadow:0 24px 80px rgba(0,0,0,.35);animation:fadeUp .2s ease;text-align:center;}
+
+@media(max-width:768px){
+  .g2{grid-template-columns:1fr;}
+  .g3,.g4{grid-template-columns:1fr 1fr;}
+  .page{padding:14px;}
+  .htitle{font-size:13px;}
+}
+@media(max-width:480px){
+  .g3,.g4{grid-template-columns:1fr;}
+  .igrid{grid-template-columns:1fr;}
+}
+</style>
 </head>
 <body>
 
-    <!-- SECCIÓN DE PRESENTACIÓN -->
-    <header class="presentacion">
-        <h1>🏥 ErgoSalud App</h1>
-        <div class="info-proyecto">
-            <p><strong>Grupo:</strong> Unipersonal</p>
-            <p><strong>Integrante:</strong> Jose Zapata</p>
-            <p><strong>Carrera:</strong> Ingeniería Industrial (Enfoque en Salud Ocupacional)</p>
-            <p><strong>Objetivo:</strong> Proporcionar una herramienta interactiva y visual que permita identificar de manera preliminar los riesgos ergonómicos en puestos de trabajo, ayudando a prevenir enfermedades laborales.</p>
-            <p><strong>Instrucciones de uso:</strong> 1. Selecciona las condiciones de trabajo en el formulario. 2. Haz clic en "Evaluar Riesgo". 3. Observa el resultado visual y las recomendaciones generadas automáticamente.</p>
+<!-- LOGIN -->
+<div id="loginScreen">
+  <div class="login-box">
+    <div class="login-logo">
+      <div class="login-logo-icon">🏥</div>
+      <div class="login-title">Inicio de Tratamiento</div>
+      <div class="login-brand">HELSE</div>
+      <div class="login-sub">Sistema de Gestión de Entregas</div>
+    </div>
+    <div class="login-error" id="loginError">Usuario o contraseña incorrectos</div>
+    <div class="form-group">
+      <label class="form-label">Usuario</label>
+      <input class="form-input" id="lUser" placeholder="Tu usuario" autocomplete="username">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Contraseña</label>
+      <input type="password" class="form-input" id="lPass" placeholder="••••••••" autocomplete="current-password">
+    </div>
+    <button class="btn" onclick="doLogin()">Ingresar al sistema</button>
+    <div style="margin-top:16px;background:#f8f6f2;border-radius:8px;padding:12px;font-size:11px;color:var(--muted);line-height:1.8;">
+      <strong>Accesos de prueba:</strong><br>
+      superadmin / Helse2026* &nbsp;|&nbsp; admin.helse / Admin123* &nbsp;|&nbsp; entregador1 / Entrega123*
+    </div>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="appShell">
+  <div class="header">
+    <div class="hbrand">
+      <div class="hlogo">🏥</div>
+      <div class="htitle">Inicio de Tratamiento <span>HELSE</span></div>
+    </div>
+    <div class="hright">
+      <div class="uchip">
+        <div class="uavatar" id="uAv">?</div>
+        <div><div class="uname" id="uNm">—</div><div class="urole" id="uRl">—</div></div>
+      </div>
+      <button class="btn-logout" onclick="doLogout()">Salir</button>
+    </div>
+  </div>
+  <div class="nav" id="mainNav"></div>
+
+  <!-- DASHBOARD -->
+  <div class="page active" id="page-dashboard">
+    <div class="g4" style="margin-bottom:22px" id="dStats"></div>
+    <div class="stitle">📋 Actividad Reciente</div>
+    <div id="dRecent"></div>
+  </div>
+
+  <!-- NUEVA SOLICITUD -->
+  <div class="page" id="page-nueva">
+    <div class="g2">
+      <div>
+        <div class="card">
+          <div class="stitle">📄 Cargar Remisión Helse</div>
+          <div class="upload-zone" id="uploadZone" onclick="document.getElementById('fi').click()">
+            <div class="ui">📋</div>
+            <div class="ut" id="upText">Subir PDF o imagen de remisión</div>
+            <div class="us">Haz clic o arrastra aquí</div>
+          </div>
+          <input type="file" id="fi" accept=".pdf,image/*" style="display:none">
+          <div class="lbar" id="lbar"></div>
+          <div class="extracted" id="extracted">
+            <div class="exh">
+              <span class="exlbl">✅ Datos extraídos</span>
+              <span class="labbadge" id="labBadge">—</span>
+            </div>
+            <div id="prodList"></div>
+            <div style="font-size:10px;color:rgba(255,255,255,.3);margin-top:6px" id="remNum"></div>
+          </div>
         </div>
-    </header>
-
-    <!-- SECCIÓN DE LA APLICACIÓN INTERACTIVA -->
-    <main class="app-container">
-        <h2>🛠️ Evaluación Rápida de Puesto</h2>
-        <form id="formulario-ergonomia">
-            
-            <div class="pregunta">
-                <label>1. ¿Cuál es la postura principal de la espalda?</label>
-                <div class="opciones">
-                    <label><input type="radio" name="espalda" value="1"> Sentado con apoyo lumbar adecuado</label>
-                    <label><input type="radio" name="espalda" value="2"> De pie, pero con postura recta</label>
-                    <label><input type="radio" name="espalda" value="3"> Inclinado, torcido o flexionado frecuentemente</label>
-                </div>
-            </div>
-
-            <div class="pregunta">
-                <label>2. ¿Cómo son los movimientos de brazos y manos?</label>
-                <div class="opciones">
-                    <label><input type="radio" name="brazos" value="1"> Movimientos ligeros, codos cerca del cuerpo</label>
-                    <label><input type="radio" name="brazos" value="2"> Movimientos por encima de la cabeza o extendidos</label>
-                    <label><input type="radio" name="brazos" value="3"> Movimientos muy repetitivos o que exigen mucha fuerza</label>
-                </div>
-            </div>
-
-            <div class="pregunta">
-                <label>3. ¿Cuál es la carga física (peso) que se maneja?</label>
-                <div class="opciones">
-                    <label><input type="radio" name="carga" value="1"> Trabajo liviano (sin cargar peso)</label>
-                    <label><input type="radio" name="carga" value="2"> Carga ocasional o menor a 10 kg</label>
-                    <label><input type="radio" name="carga" value="3"> Carga pesada constante (más de 10 kg)</label>
-                </div>
-            </div>
-
-            <button type="button" id="btn-calcular">🚀 Evaluar Riesgo Ahora</button>
-        </form>
-
-        <!-- Aquí aparece el resultado -->
-        <div id="resultado" class="oculto">
-            <h3>📊 Resultado de la Evaluación:</h3>
-            <p id="nivel-riesgo"></p>
-            <p id="recomendacion"></p>
+        <div class="card">
+          <div class="stitle">📍 Datos de Entrega</div>
+          <div class="form-group"><label class="form-label">Dirección exacta<span class="req">*</span></label><input class="form-input" id="fDir" placeholder="Calle 123 # 45-67, Apto 301"></div>
+          <div class="form-group"><label class="form-label">Ciudad<span class="req">*</span></label><input class="form-input" id="fCiu" placeholder="Bogotá, D.C."></div>
+          <div class="form-group"><label class="form-label">Nombre posible receptor<span class="req">*</span></label><input class="form-input" id="fRec" placeholder="Paciente o familiar"></div>
+          <div class="form-group"><label class="form-label">Observaciones</label><input class="form-input" id="fObs" placeholder="Notas adicionales..."></div>
+          <button class="btn" id="btnCrear" onclick="crearPendiente()" disabled>+ Crear Pendiente de Entrega</button>
         </div>
+      </div>
+      <div>
+        <div class="stitle">⏳ Solicitudes Recientes</div>
+        <div id="adminRecent"></div>
+      </div>
+    </div>
+  </div>
 
-    </main>
+  <!-- COLA -->
+  <div class="page" id="page-cola">
+    <div class="g4" style="margin-bottom:20px" id="colaStats"></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:22px">
+      <div><div class="stitle">📬 Disponibles para tomar</div><div id="colaDisp"></div></div>
+      <div><div class="stitle">📦 Mis asignaciones activas</div><div id="colaMias"></div></div>
+    </div>
+  </div>
 
-    <!-- CÓDIGO JAVASCRIPT (INTERACTIVIDAD) -->
-    <script>
-        const botonCalcular = document.getElementById('btn-calcular');
-        const divResultado = document.getElementById('resultado');
-        const nivelRiesgo = document.getElementById('nivel-riesgo');
-        const recomendacion = document.getElementById('recomendacion');
+  <!-- REPORTES -->
+  <div class="page" id="page-reportes">
+    <div class="card">
+      <div class="stitle">📊 Filtros</div>
+      <div class="rfilters">
+        <div class="fg"><span class="flbl">Estado</span><select class="fsel" id="rEst"><option value="">Todos</option><option value="pendiente">Pendiente</option><option value="aceptado">Aceptado</option><option value="entregado">Entregado</option></select></div>
+        <div class="fg"><span class="flbl">Laboratorio</span><select class="fsel" id="rLab"><option value="">Todos</option><option>Fresenius</option><option>Abbott</option><option>Nestlé</option><option>Baxter</option><option>B.Braun</option><option>Danone Nutricia</option><option>Pfizer</option></select></div>
+        <div class="fg"><span class="flbl">Desde</span><input type="date" class="finp" id="rDesde"></div>
+        <div class="fg"><span class="flbl">Hasta</span><input type="date" class="finp" id="rHasta"></div>
+        <button class="btn" style="width:auto;padding:9px 18px" onclick="applyReport()">🔍 Filtrar</button>
+        <button class="btn dark" style="width:auto;padding:9px 18px" onclick="exportPDF()">⬇️ Exportar PDF</button>
+      </div>
+    </div>
+    <div class="g4" style="margin:18px 0" id="rStats"></div>
+    <div class="card"><div class="stitle">📋 Resultados</div><div style="overflow-x:auto"><table><thead><tr><th>#</th><th>Fecha</th><th>Laboratorio</th><th>Productos</th><th>Dirección</th><th>Ciudad</th><th>Entregador</th><th>Receptor</th><th>Estado</th></tr></thead><tbody id="rBody"></tbody></table></div></div>
+  </div>
 
-        botonCalcular.addEventListener('click', function() {
-            const espalda = document.querySelector('input[name="espalda"]:checked');
-            const brazos = document.querySelector('input[name="brazos"]:checked');
-            const carga = document.querySelector('input[name="carga"]:checked');
+  <!-- USUARIOS -->
+  <div class="page" id="page-usuarios">
+    <div style="display:grid;grid-template-columns:320px 1fr;gap:24px">
+      <div class="card">
+        <div class="stitle">➕ Nuevo Usuario</div>
+        <div class="form-group"><label class="form-label">Nombre completo</label><input class="form-input" id="uN" placeholder="Juan Pérez"></div>
+        <div class="form-group"><label class="form-label">Usuario</label><input class="form-input" id="uU" placeholder="juan.perez"></div>
+        <div class="form-group"><label class="form-label">Contraseña</label><input type="password" class="form-input" id="uP" placeholder="Mínimo 6 caracteres"></div>
+        <div class="form-group"><label class="form-label">Rol</label><select class="form-input" id="uR"><option value="admin">Administrador</option><option value="entregador">Entregador</option></select></div>
+        <button class="btn" onclick="crearUsuario()">Crear Usuario</button>
+      </div>
+      <div><div class="stitle">👥 Usuarios del Sistema</div><div id="usersGrid"></div></div>
+    </div>
+  </div>
+</div>
 
-            if (!espalda || !brazos || !carga) {
-                alert('⚠️ Por favor, responde todas las preguntas antes de evaluar.');
-                return;
-            }
+<!-- DELIVERY MODAL -->
+<div class="mo" id="mDelivery">
+  <div class="modal">
+    <div class="mh"><div class="mt">✍️ Registrar Entrega</div><button class="mc" onclick="closeMo('mDelivery')">✕</button></div>
+    <div class="mb">
+      <div class="steps"><div class="sdot cur" id="s1"></div><div class="sdot" id="s2"></div><div class="sdot" id="s3"></div></div>
+      <div class="dstep on" id="ds1">
+        <div class="stitle">👤 Datos del Receptor</div>
+        <div class="form-group"><label class="form-label">Nombre completo<span class="req">*</span></label><input class="form-input" id="dN" placeholder="Nombre de quien recibe"></div>
+        <div class="form-group"><label class="form-label">Documento de identidad<span class="req">*</span></label><input class="form-input" id="dD" placeholder="CC / TI / CE / Pasaporte"></div>
+        <div class="form-group"><label class="form-label">Parentesco / Rol</label><input class="form-input" id="dR" placeholder="Paciente, familiar, cuidador..."></div>
+        <button class="btn" onclick="gStep(2)">Siguiente →</button>
+      </div>
+      <div class="dstep" id="ds2">
+        <div class="stitle">✏️ Firma del Receptor</div>
+        <div class="sigbox"><div class="sigph" id="sigPh">Firme aquí con el dedo o mouse</div><canvas id="signatureCanvas" width="440" height="170"></canvas></div>
+        <div style="display:flex;gap:8px;margin-bottom:14px"><button class="btn sm" onclick="clearSig()">🗑️ Borrar firma</button></div>
+        <div style="display:flex;gap:8px"><button class="btn sm" style="flex:1" onclick="gStep(1)">← Atrás</button><button class="btn" style="flex:2" onclick="gStep(3)">Siguiente →</button></div>
+      </div>
+      <div class="dstep" id="ds3">
+        <div class="stitle">📋 Resumen de Entrega</div>
+        <div id="dSummary" style="background:#f8f6f2;border-radius:10px;padding:14px;margin-bottom:16px;font-size:13px;line-height:1.85"></div>
+        <div style="display:flex;gap:8px"><button class="btn sm" style="flex:1" onclick="gStep(2)">← Atrás</button><button class="btn green" style="flex:2" onclick="confirmar()">✅ Confirmar y Generar PDF</button></div>
+      </div>
+    </div>
+  </div>
+</div>
 
-            let puntuacionTotal = parseInt(espalda.value) + parseInt(brazos.value) + parseInt(carga.value);
+<!-- CONFIRM MODAL -->
+<div class="mo" id="mConfirm">
+  <div class="cmodal">
+    <div style="font-size:40px;margin-bottom:12px" id="cIco">⚠️</div>
+    <div style="font-family:'Syne',sans-serif;font-size:16px;font-weight:700;margin-bottom:8px" id="cTit">¿Estás seguro?</div>
+    <div style="font-size:13px;color:var(--muted);margin-bottom:20px" id="cSub">Esta acción no se puede deshacer.</div>
+    <div style="display:flex;gap:10px"><button class="btn sm" style="flex:1" onclick="closeMo('mConfirm')">Cancelar</button><button class="btn" style="flex:1;background:#ef4444" id="cBtn">Confirmar</button></div>
+  </div>
+</div>
 
-            // Limpiar clases anteriores y mostrar
-            divResultado.classList.remove('oculto', 'riesgo-bajo', 'riesgo-medio', 'riesgo-alto');
+<div class="toast" id="toast"></div>
 
-            if (puntuacionTotal <= 4) {
-                divResultado.classList.add('riesgo-bajo');
-                nivelRiesgo.textContent = '✅ Nivel de Riesgo: BAJO';
-                recomendacion.textContent = 'El puesto parece tener condiciones favorables. Mantenga estas buenas prácticas ergonómicas e implemente pausas activas.';
-            } else if (puntuacionTotal <= 7) {
-                divResultado.classList.add('riesgo-medio');
-                nivelRiesgo.textContent = '⚠️ Nivel de Riesgo: MEDIO';
-                recomendacion.textContent = 'Se requiere atención. Sugerencia: Mejore la estación de trabajo, ajuste la altura de sillas/mesas y reduzca la carga manipulada.';
-            } else {
-                divResultado.classList.add('riesgo-alto');
-                nivelRiesgo.textContent = '🚨 Nivel de Riesgo: ALTO';
-                recomendacion.textContent = '¡Peligro potencial para la salud del trabajador! Se requiere un rediseño inmediato del puesto, uso de ayudas mecánicas para carga y rotación de personal.';
-            }
+<script>
+// ─── STORAGE ───
+async function sg(k){try{const r=await window.storage.get(k);return r?JSON.parse(r.value):null;}catch{return null;}}
+async function ss(k,v){try{await window.storage.set(k,JSON.stringify(v));}catch(e){console.error(e);}}
 
-            // Hacer scroll suave hacia el resultado
-            divResultado.scrollIntoView({ behavior: 'smooth' });
-        });
-    </script>
+// ─── STATE ───
+let CU=null,users=[],entregas=[],exData=null,curDel=null,sigDrawn=false,drawing=false,lx=0,ly=0,ctx=null;
+
+// ─── DEFAULTS ───
+const DEF_USERS=[
+  {id:1,nombre:'Super Administrador',username:'superadmin',password:'Helse2026*',role:'superadmin',active:true},
+  {id:2,nombre:'Administrador HELSE',username:'admin.helse',password:'Admin123*',role:'admin',active:true},
+  {id:3,nombre:'Entregador Uno',username:'entregador1',password:'Entrega123*',role:'entregador',active:true}
+];
+
+// ─── INIT ───
+window.addEventListener('load',async()=>{
+  const su=await sg('helse-users');
+  users=su||DEF_USERS;
+  if(!su)await ss('helse-users',users);
+  const se=await sg('helse-entregas');
+  entregas=se||[];
+  const sess=await sg('helse-session');
+  if(sess){const u=users.find(u=>u.id===sess.id&&u.active);if(u){loginAs(u);return;}}
+  initSig();
+});
+
+// ─── AUTH ───
+document.getElementById('lPass').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});
+function doLogin(){
+  const un=document.getElementById('lUser').value.trim();
+  const pw=document.getElementById('lPass').value;
+  const u=users.find(u=>u.username===un&&u.password===pw&&u.active);
+  if(!u){document.getElementById('loginError').style.display='block';return;}
+  loginAs(u);
+}
+async function loginAs(u){
+  CU=u;await ss('helse-session',{id:u.id});
+  document.getElementById('loginScreen').style.display='none';
+  document.getElementById('appShell').style.display='block';
+  document.getElementById('uAv').textContent=u.nombre.charAt(0).toUpperCase();
+  document.getElementById('uNm').textContent=u.nombre;
+  document.getElementById('uRl').textContent=rlbl(u.role);
+  buildNav();initSig();go(defPage());
+}
+async function doLogout(){
+  await ss('helse-session',null);CU=null;
+  document.getElementById('appShell').style.display='none';
+  document.getElementById('loginScreen').style.display='flex';
+  document.getElementById('lUser').value='';
+  document.getElementById('lPass').value='';
+  document.getElementById('loginError').style.display='none';
+}
+function rlbl(r){return{superadmin:'Super Admin',admin:'Administrador',entregador:'Entregador'}[r]||r;}
+function defPage(){return CU.role==='entregador'?'cola':'dashboard';}
+
+// ─── NAV ───
+const NAVS={
+  superadmin:[{id:'dashboard',l:'🏠 Dashboard'},{id:'nueva',l:'➕ Nueva Solicitud'},{id:'cola',l:'🚚 Cola'},{id:'reportes',l:'📊 Reportes'},{id:'usuarios',l:'👥 Usuarios'}],
+  admin:[{id:'dashboard',l:'🏠 Dashboard'},{id:'nueva',l:'➕ Nueva Solicitud'},{id:'cola',l:'🚚 Cola'},{id:'reportes',l:'📊 Reportes'}],
+  entregador:[{id:'cola',l:'🚚 Mi Cola'},{id:'reportes',l:'📊 Mis Entregas'}]
+};
+function buildNav(){
+  document.getElementById('mainNav').innerHTML=(NAVS[CU.role]||[]).map(i=>`<div class="nitem" id="n-${i.id}" onclick="go('${i.id}')">${i.l}</div>`).join('');
+}
+function go(pid){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nitem').forEach(n=>n.classList.remove('active'));
+  const pg=document.getElementById('page-'+pid);
+  const ni=document.getElementById('n-'+pid);
+  if(pg)pg.classList.add('active');
+  if(ni)ni.classList.add('active');
+  render(pid);
+}
+function render(id){
+  if(id==='dashboard')renderDash();
+  if(id==='nueva')renderNueva();
+  if(id==='cola')renderCola();
+  if(id==='reportes')applyReport();
+  if(id==='usuarios')renderUsers();
+}
+
+// ─── DASHBOARD ───
+function renderDash(){
+  const p=entregas.filter(e=>e.status==='pendiente').length;
+  const a=entregas.filter(e=>e.status==='aceptado').length;
+  const en=entregas.filter(e=>e.status==='entregado').length;
+  document.getElementById('dStats').innerHTML=`
+    ${sc('📋',entregas.length,'Total')}${sc('⏳',p,'Pendientes','var(--accent)')}${sc('🚚',a,'En camino','#3498db')}${sc('✅',en,'Entregados','var(--green)')}`;
+  const rec=[...entregas].reverse().slice(0,5);
+  document.getElementById('dRecent').innerHTML=rec.length?rec.map(e=>pcHTML(e)).join(''):empty('📭','Sin actividad aún','Crea la primera solicitud');
+}
+
+function sc(ico,n,lbl,color='var(--red)'){return`<div class="stat"><div style="font-size:20px;margin-bottom:5px">${ico}</div><div class="snum" style="color:${color}">${n}</div><div class="slbl">${lbl}</div></div>`;}
+
+// ─── NUEVA SOLICITUD ───
+function renderNueva(){
+  const rec=[...entregas].reverse().slice(0,5);
+  document.getElementById('adminRecent').innerHTML=rec.length?rec.map(e=>pcHTML(e)).join(''):empty('📭','Sin solicitudes','Carga una remisión para comenzar');
+}
+
+// ─── FILE UPLOAD ───
+const uz=document.getElementById('uploadZone');
+uz.addEventListener('dragover',e=>{e.preventDefault();uz.classList.add('drag');});
+uz.addEventListener('dragleave',()=>uz.classList.remove('drag'));
+uz.addEventListener('drop',e=>{e.preventDefault();uz.classList.remove('drag');if(e.dataTransfer.files[0])procFile(e.dataTransfer.files[0]);});
+document.getElementById('fi').addEventListener('change',e=>{if(e.target.files[0])procFile(e.target.files[0]);});
+['fDir','fCiu','fRec'].forEach(id=>document.getElementById(id).addEventListener('input',chkForm));
+
+async function procFile(file){
+  const bar=document.getElementById('lbar');bar.classList.add('on');
+  document.getElementById('upText').textContent='⏳ Procesando...';
+  try{
+    if(file.type==='application/pdf'){
+      pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+      const ab=await file.arrayBuffer();
+      const pdf=await pdfjsLib.getDocument({data:ab}).promise;
+      let txt='';
+      for(let i=1;i<=pdf.numPages;i++){const pg=await pdf.getPage(i);const c=await pg.getTextContent();txt+=c.items.map(s=>s.str).join(' ')+'\n';}
+      parseTxt(txt);
+    }else{
+      const b64=await f2b64(file);
+      const raw=await claudeExtract(b64,file.type);
+      parseJSON(raw);
+    }
+  }catch(err){toast('Error al procesar: '+err.message,'err');document.getElementById('upText').textContent='Subir PDF o imagen de remisión';}
+  bar.classList.remove('on');
+}
+
+function f2b64(file){return new Promise((r,j)=>{const rd=new FileReader();rd.onload=()=>r(rd.result.split(',')[1]);rd.onerror=j;rd.readAsDataURL(file);});}
+
+async function claudeExtract(b64,mt){
+  const res=await fetch('https://api.anthropic.com/v1/messages',{
+    method:'POST',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,messages:[{role:'user',content:[
+      {type:'image',source:{type:'base64',media_type:mt,data:b64}},
+      {type:'text',text:`Eres un extractor de remisiones Helse SAS Colombia. Devuelve SOLO JSON sin markdown:\n{"remision":"número","fecha":"fecha","productos":[{"codigo":"","descripcion":"descripción completa","cantidad":número,"unidad":"und"}]}\nIncluye todos los productos.`}
+    ]}]})
+  });
+  const d=await res.json();
+  return d.content.map(i=>i.text||'').join('');
+}
+
+const LAB={
+  'Fresenius':['DIBEN','FRESUBIN','STRUCTOKABIVEN','SMOFKABIVEN','KABIVEN','SMOFLIPID','DIPEPTIVEN','CERNEVIT','TRACUTIL','ADDAVEN','PERIKABIVEN','NUTRIFLEX','AMINOMIX','LIPIDEM','OMEGAVEN'],
+  'Abbott':['ENSURE','GLUCERNA','NEPRO','SUPLENA','JEVITY','OSMOLITE','PROMOTE','PULMOCARE','VITAL'],
+  'Nestlé':['PEPTAMEN','ISOSOURCE','RESOURCE','NOVASOURCE','CLINUTREN','MODULEN','IMPACT','NUTREN'],
+  'Baxter':['OLIMEL','CLINIMIX','NUMETA','OLICLINOMEL','VAMIN'],
+  'B.Braun':['AMINOMEL','AMINOVEN','LIPOFUNDIN','LIPOVENOES'],
+  'Danone Nutricia':['FORTIMEL','FORTISIP','FORTIJUICE','NUTRISON','DIASIP'],
+  'Pfizer':['ADVERA','RENUTRYL','MERITENE']
+};
+
+function detectLab(prods){
+  for(const p of prods){
+    const d=((p.descripcion||'')+(p.codigo||'')).toUpperCase();
+    for(const [lab,kws]of Object.entries(LAB)){if(kws.some(k=>d.includes(k)))return lab;}
+  }
+  return 'Laboratorio Genérico';
+}
+
+function parseTxt(txt){
+  const prods=[];
+  for(const line of txt.split(/[\n\r]+/)){
+    const m=line.match(/(\d+(?:[.,]\d+)?)\s*(?:und|unid|caja|bolsa|frasco)/i);
+    if(m&&line.trim().length>8)prods.push({codigo:'',descripcion:line.trim().substring(0,80),cantidad:parseFloat(m[1].replace(',','.')),unidad:'und'});
+  }
+  const rm=txt.match(/(\d{3,6})/);
+  setExtracted(prods,rm?rm[1]:'');
+}
+
+function parseJSON(raw){
+  try{
+    const clean=raw.replace(/```json|```/g,'').trim();
+    const d=JSON.parse(clean);
+    setExtracted(d.productos||[],d.remision||'');
+  }catch{toast('No se pudo leer la respuesta','err');}
+}
+
+function setExtracted(prods,rem){
+  const lab=detectLab(prods);
+  exData={products:prods,remision:rem,laboratory:lab};
+  document.getElementById('labBadge').textContent=lab;
+  document.getElementById('remNum').textContent=rem?`Remisión #${rem}`:'';
+  document.getElementById('prodList').innerHTML=prods.map(p=>`<div class="prow"><div><div class="pname">${p.descripcion}</div></div><div style="text-align:right"><div class="pqty">${p.cantidad}</div><div class="punit">${p.unidad}</div></div></div>`).join('');
+  document.getElementById('extracted').classList.add('on');
+  document.getElementById('upText').textContent='✅ Remisión cargada';
+  toast('Remisión procesada correctamente','ok');
+  chkForm();
+}
+
+function chkForm(){
+  const ok=exData&&document.getElementById('fDir').value.trim()&&document.getElementById('fCiu').value.trim()&&document.getElementById('fRec').value.trim();
+  document.getElementById('btnCrear').disabled=!ok;
+}
+
+async function crearPendiente(){
+  const dir=document.getElementById('fDir').value.trim();
+  const ciu=document.getElementById('fCiu').value.trim();
+  const rec=document.getElementById('fRec').value.trim();
+  let err=false;
+  ['fDir','fCiu','fRec'].forEach(id=>{const el=document.getElementById(id);if(!el.value.trim()){el.classList.add('error');err=true;}else el.classList.remove('error');});
+  if(err){toast('Completa los campos obligatorios','err');return;}
+  const e={id:Date.now(),status:'pendiente',laboratory:exData.laboratory,remision:exData.remision,products:exData.products,
+    direccion:dir,ciudad:ciu,posibleReceptor:rec,observaciones:document.getElementById('fObs').value.trim(),
+    creadoPor:CU.id,creadoPorNombre:CU.nombre,createdAt:new Date().toISOString(),
+    entregadorId:null,entregadorNombre:null,aceptadoAt:null,
+    receptor:null,documento:null,parentesco:null,signature:null,deliveredAt:null};
+  entregas.push(e);await saveE();resetForm();renderNueva();toast('✅ Pendiente creado','ok');
+}
+
+function resetForm(){
+  exData=null;document.getElementById('extracted').classList.remove('on');
+  ['fDir','fCiu','fRec','fObs'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('btnCrear').disabled=true;document.getElementById('fi').value='';
+  document.getElementById('upText').textContent='Subir PDF o imagen de remisión';
+}
+
+// ─── COLA ───
+async function renderCola(){
+  const isE=CU.role==='entregador';
+  const disp=entregas.filter(e=>e.status==='pendiente');
+  const mias=entregas.filter(e=>e.status==='aceptado'&&(!isE||e.entregadorId===CU.id));
+  const entr=entregas.filter(e=>e.status==='entregado'&&(!isE||e.entregadorId===CU.id));
+  document.getElementById('colaStats').innerHTML=`
+    ${sc('📬',disp.length,'Disponibles','var(--accent)')}
+    ${sc('🚚',mias.length,isE?'Mis asignadas':'En camino','#3498db')}
+    ${sc('✅',entr.length,isE?'Mis entregas':'Entregadas','var(--green)')}
+    ${sc('📋',entregas.length,'Total')}`;
+  document.getElementById('colaDisp').innerHTML=disp.length?disp.map(e=>qCard(e,'disp')).join(''):empty('🎉','Sin pendientes','Todo está asignado');
+  document.getElementById('colaMias').innerHTML=mias.length?mias.map(e=>qCard(e,'asig')).join(''):empty('📦',isE?'Sin asignaciones':'Sin envíos en camino',isE?'Acepta un envío':'');
+}
+
+function qCard(e,tipo){
+  const asig=tipo==='asig';
+  const tc=asig?'b':'y';
+  const txt=asig?`🚚 ${e.entregadorNombre||'En camino'}`:'⏳ DISPONIBLE';
+  const bc=asig?'b':'y';
+  return`<div class="pcard">
+    <div class="ptop ${tc}">
+      <div class="pbadge ${bc}">${!asig?`<div class="dot y"></div>`:''} ${txt}</div>
+      <span class="labtag">🏭 ${e.laboratory}</span>
+    </div>
+    <div class="pbody">
+      <div class="igrid">
+        <div><div class="ilbl">Dirección</div><div class="ival">${e.direccion}</div></div>
+        <div><div class="ilbl">Ciudad</div><div class="ival">${e.ciudad}</div></div>
+        <div><div class="ilbl">Posible receptor</div><div class="ival">${e.posibleReceptor}</div></div>
+        <div><div class="ilbl">Creado</div><div class="ival" style="font-size:11px">${fd(e.createdAt)}</div></div>
+      </div>
+      <div class="pbox">${e.products.map(p=>`<div class="pi"><span>${p.descripcion}</span><span class="piq">${p.cantidad} ${p.unidad}</span></div>`).join('')}</div>
+      ${e.observaciones?`<div style="font-size:11px;color:var(--muted);margin-bottom:8px">📝 ${e.observaciones}</div>`:''}
+      ${!asig?`<button class="btn" onclick="aceptar(${e.id})">📦 Aceptar este envío</button>`
+        :`<button class="btn green" onclick="openDel(${e.id})">✍️ Registrar Entrega</button>`}
+    </div>
+  </div>`;
+}
+
+async function aceptar(id){
+  const e=entregas.find(x=>x.id===id);
+  if(!e||e.status!=='pendiente'){toast('Ya no disponible','err');renderCola();return;}
+  e.status='aceptado';e.entregadorId=CU.id;e.entregadorNombre=CU.nombre;e.aceptadoAt=new Date().toISOString();
+  await saveE();renderCola();toast('✅ Envío aceptado y asignado a ti','ok');
+}
+
+// ─── DELIVERY MODAL ───
+function openDel(id){
+  curDel=id;
+  ['dN','dD','dR'].forEach(i=>{document.getElementById(i).value='';document.getElementById(i).classList.remove('error');});
+  clearSig();gStep(1,true);document.getElementById('mDelivery').classList.add('open');
+}
+
+function gStep(n,init=false){
+  if(!init){
+    if(n===2){let err=false;['dN','dD'].forEach(id=>{const el=document.getElementById(id);if(!el.value.trim()){el.classList.add('error');err=true;}else el.classList.remove('error');});if(err){toast('Completa nombre y documento','err');return;}}
+    if(n===3&&!sigDrawn){toast('El receptor debe firmar','err');return;}
+  }
+  document.querySelectorAll('.dstep').forEach(s=>s.classList.remove('on'));
+  document.getElementById('ds'+n).classList.add('on');
+  [1,2,3].forEach(i=>{const d=document.getElementById('s'+i);d.className='sdot'+(i<n?' done':i===n?' cur':'');});
+  if(n===3)buildSum();
+}
+
+function buildSum(){
+  const e=entregas.find(x=>x.id===curDel);if(!e)return;
+  const nm=document.getElementById('dN').value.trim();
+  const dc=document.getElementById('dD').value.trim();
+  const rl=document.getElementById('dR').value.trim();
+  document.getElementById('dSummary').innerHTML=`<div style="display:grid;gap:5px">
+    <div>🏭 <strong>Laboratorio:</strong> ${e.laboratory}</div>
+    <div>📍 <strong>Dirección:</strong> ${e.direccion}, ${e.ciudad}</div>
+    <div>📦 <strong>Productos:</strong><br>${e.products.map(p=>`&nbsp;&nbsp;• ${p.descripcion} — <strong>${p.cantidad} ${p.unidad}</strong>`).join('<br>')}</div>
+    <div>🚚 <strong>Entregado por:</strong> ${CU.nombre}</div>
+    <div>👤 <strong>Receptor:</strong> ${nm}</div>
+    <div>🪪 <strong>Documento:</strong> ${dc}</div>
+    ${rl?`<div>🔗 <strong>Rol:</strong> ${rl}</div>`:''}
+    <div>✍️ <strong>Firma:</strong> <span style="color:var(--green)">Capturada ✓</span></div>
+  </div>`;
+}
+
+async function confirmar(){
+  const e=entregas.find(x=>x.id===curDel);if(!e)return;
+  e.receptor=document.getElementById('dN').value.trim();
+  e.documento=document.getElementById('dD').value.trim();
+  e.parentesco=document.getElementById('dR').value.trim();
+  e.signature=document.getElementById('signatureCanvas').toDataURL();
+  e.status='entregado';e.deliveredAt=new Date().toISOString();
+  await saveE();closeMo('mDelivery');genPDF(e);renderCola();toast('✅ Entrega confirmada — PDF generado','ok');
+}
+
+// ─── SIGNATURE ───
+function initSig(){
+  const canvas=document.getElementById('signatureCanvas');if(!canvas)return;
+  ctx=canvas.getContext('2d');ctx.strokeStyle='#1a1a2e';ctx.lineWidth=2;ctx.lineCap='round';ctx.lineJoin='round';
+  const gp=e=>{const r=canvas.getBoundingClientRect();const sx=canvas.width/r.width,sy=canvas.height/r.height;
+    if(e.touches)return{x:(e.touches[0].clientX-r.left)*sx,y:(e.touches[0].clientY-r.top)*sy};
+    return{x:(e.clientX-r.left)*sx,y:(e.clientY-r.top)*sy};};
+  canvas.addEventListener('mousedown',e=>{drawing=true;const p=gp(e);lx=p.x;ly=p.y;sigDrawn=true;document.getElementById('sigPh').style.opacity='0';});
+  canvas.addEventListener('mousemove',e=>{if(!drawing)return;const p=gp(e);ctx.beginPath();ctx.moveTo(lx,ly);ctx.lineTo(p.x,p.y);ctx.stroke();lx=p.x;ly=p.y;});
+  canvas.addEventListener('mouseup',()=>drawing=false);
+  canvas.addEventListener('mouseleave',()=>drawing=false);
+  canvas.addEventListener('touchstart',e=>{e.preventDefault();drawing=true;const p=gp(e);lx=p.x;ly=p.y;sigDrawn=true;document.getElementById('sigPh').style.opacity='0';},{passive:false});
+  canvas.addEventListener('touchmove',e=>{e.preventDefault();if(!drawing)return;const p=gp(e);ctx.beginPath();ctx.moveTo(lx,ly);ctx.lineTo(p.x,p.y);ctx.stroke();lx=p.x;ly=p.y;},{passive:false});
+  canvas.addEventListener('touchend',()=>drawing=false);
+}
+
+function clearSig(){if(!ctx)return;ctx.clearRect(0,0,440,170);sigDrawn=false;const ph=document.getElementById('sigPh');if(ph)ph.style.opacity='1';}
+
+// ─── REPORTS ───
+function applyReport(){
+  const est=document.getElementById('rEst')?.value||'';
+  const lab=document.getElementById('rLab')?.value||'';
+  const des=document.getElementById('rDesde')?.value||'';
+  const has=document.getElementById('rHasta')?.value||'';
+  let f=[...entregas];
+  if(est)f=f.filter(e=>e.status===est);
+  if(lab)f=f.filter(e=>e.laboratory===lab);
+  if(des)f=f.filter(e=>e.createdAt>=des);
+  if(has)f=f.filter(e=>e.createdAt<=has+'T23:59:59');
+  if(CU.role==='entregador')f=f.filter(e=>e.entregadorId===CU.id||e.status==='entregado');
+  document.getElementById('rStats').innerHTML=`
+    ${sc('📋',f.length,'Resultados')}${sc('⏳',f.filter(e=>e.status==='pendiente').length,'Pendientes','var(--accent)')}
+    ${sc('🚚',f.filter(e=>e.status==='aceptado').length,'En camino','#3498db')}${sc('✅',f.filter(e=>e.status==='entregado').length,'Entregados','var(--green)')}`;
+  document.getElementById('rBody').innerHTML=f.length?f.map((e,i)=>`<tr>
+    <td style="font-weight:700;color:var(--red)">${i+1}</td>
+    <td>${fd(e.createdAt)}</td>
+    <td><span class="labtag">🏭 ${e.laboratory}</span></td>
+    <td style="max-width:180px">${e.products.map(p=>p.descripcion+' ('+p.cantidad+')').join('<br>')}</td>
+    <td>${e.direccion}</td><td>${e.ciudad}</td>
+    <td>${e.entregadorNombre||'—'}</td><td>${e.receptor||'—'}</td>
+    <td><span class="sbadge ${e.status}">${{pendiente:'⏳ Pendiente',aceptado:'🚚 En camino',entregado:'✅ Entregado'}[e.status]}</span></td>
+  </tr>`).join(''):`<tr><td colspan="9" style="text-align:center;padding:28px;color:var(--muted)">Sin resultados</td></tr>`;
+}
+
+function exportPDF(){
+  const {jsPDF}=window.jspdf;const doc=new jsPDF({unit:'mm',format:'a4',orientation:'landscape'});
+  const W=297;
+  doc.setFillColor(26,26,46);doc.rect(0,0,W,28,'F');
+  doc.setTextColor(255,255,255);doc.setFont('helvetica','bold');doc.setFontSize(15);
+  doc.text('INICIO DE TRATAMIENTO HELSE — REPORTE DE ENTREGAS',14,12);
+  doc.setFontSize(8);doc.setTextColor(232,160,32);
+  doc.text(`Generado: ${new Date().toLocaleString('es-CO')} | Por: ${CU.nombre}`,14,20);
+  let y=36;
+  const hs=['#','Fecha','Laboratorio','Producto','Dirección','Ciudad','Entregador','Receptor','Estado'];
+  const cw=[8,24,26,48,34,22,28,26,22];
+  let x=14;
+  doc.setFillColor(26,26,46);doc.rect(14,y-5,W-28,9,'F');
+  doc.setTextColor(255,255,255);doc.setFontSize(7);
+  hs.forEach((h,i)=>{doc.text(h,x+1,y);x+=cw[i];});y+=6;
+  const filtered=entregas.filter(e=>CU.role!=='entregador'||e.entregadorId===CU.id);
+  filtered.forEach((e,idx)=>{
+    if(y>188){doc.addPage();y=14;}
+    doc.setFillColor(idx%2===0?255:248,idx%2===0?255:248,idx%2===0?255:246);
+    doc.rect(14,y-4,W-28,8,'F');
+    doc.setTextColor(30,30,30);doc.setFont('helvetica','normal');doc.setFontSize(7);
+    x=14;
+    const row=[String(idx+1),fd(e.createdAt).substring(0,10),e.laboratory,e.products.map(p=>p.descripcion).join(', ').substring(0,44),e.direccion.substring(0,28),e.ciudad,e.entregadorNombre||'—',e.receptor||'—',{pendiente:'Pendiente',aceptado:'En camino',entregado:'Entregado'}[e.status]];
+    row.forEach((v,i)=>{doc.text(String(v).substring(0,Math.floor(cw[i]*1.4)),x+1,y);x+=cw[i];});y+=8;
+  });
+  doc.setFillColor(26,26,46);doc.rect(0,198,W,12,'F');
+  doc.setTextColor(255,255,255);doc.setFontSize(7);
+  doc.text('GRUPO HELSE SAS — NIT 901401880-4 — Bogotá, D.C.',W/2,206,{align:'center'});
+  doc.save(`Reporte_HELSE_${new Date().toISOString().substring(0,10)}.pdf`);
+}
+
+// ─── USERS ───
+function renderUsers(){
+  document.getElementById('usersGrid').innerHTML=users.map(u=>`
+    <div class="urow">
+      <div class="uinfo">
+        <div class="uav">${u.nombre.charAt(0)}</div>
+        <div><div class="unam">${u.nombre}</div><div class="uuser">@${u.username}${!u.active?' · <span style="color:#ef4444">Inactivo</span>':''}</div></div>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px">
+        <span class="rpill ${u.role}">${rlbl(u.role)}</span>
+        ${u.role!=='superadmin'?`<button class="btn sm" onclick="toggleU(${u.id})">${u.active?'🔒':'🔓'}</button><button class="btn sm" onclick="confirmDel(${u.id})">🗑️</button>`:'<span style="font-size:11px;color:var(--muted)">Protegido</span>'}
+      </div>
+    </div>`).join('');
+}
+
+async function crearUsuario(){
+  const n=document.getElementById('uN').value.trim();
+  const u=document.getElementById('uU').value.trim();
+  const p=document.getElementById('uP').value;
+  const r=document.getElementById('uR').value;
+  if(!n||!u||!p){toast('Completa todos los campos','err');return;}
+  if(p.length<6){toast('Mínimo 6 caracteres en contraseña','err');return;}
+  if(users.find(x=>x.username===u)){toast('Ese usuario ya existe','err');return;}
+  users.push({id:Date.now(),nombre:n,username:u,password:p,role:r,active:true});
+  await ss('helse-users',users);
+  ['uN','uU','uP'].forEach(id=>document.getElementById(id).value='');
+  renderUsers();toast('✅ Usuario creado','ok');
+}
+
+async function toggleU(id){
+  const u=users.find(x=>x.id===id);if(!u)return;
+  u.active=!u.active;await ss('helse-users',users);renderUsers();
+  toast(`Usuario ${u.active?'activado':'desactivado'}`,'ok');
+}
+
+function confirmDel(id){
+  const u=users.find(x=>x.id===id);if(!u)return;
+  document.getElementById('cIco').textContent='⚠️';
+  document.getElementById('cTit').textContent=`¿Eliminar a ${u.nombre}?`;
+  document.getElementById('cSub').textContent='Esta acción no se puede deshacer.';
+  document.getElementById('cBtn').onclick=()=>delUser(id);
+  document.getElementById('mConfirm').classList.add('open');
+}
+
+async function delUser(id){
+  users=users.filter(u=>u.id!==id);await ss('helse-users',users);
+  closeMo('mConfirm');renderUsers();toast('Usuario eliminado','ok');
+}
+
+// ─── PDF GENERATION ───
+function genPDF(e){
+  const {jsPDF}=window.jspdf;
+  const doc=new jsPDF({unit:'mm',format:'a4'});
+  const W=210,M=16;let y=0;
+
+  doc.setFillColor(26,26,46);doc.rect(0,0,W,36,'F');
+  doc.setTextColor(255,255,255);doc.setFont('helvetica','bold');doc.setFontSize(17);doc.text('INICIO DE TRATAMIENTO',M,14);
+  doc.setFontSize(10);doc.setTextColor(232,160,32);doc.text('HELSE — REPORTE DE ENTREGA',M,22);
+  doc.setTextColor(200,200,200);doc.setFontSize(8);
+  doc.text(`Remisión: ${e.remision||'N/A'}`,W-M,14,{align:'right'});
+  doc.text(`${new Date().toLocaleString('es-CO')}`,W-M,21,{align:'right'});
+  y=44;
+
+  const drawInfo=(title,rows,sy)=>{
+    doc.setFillColor(244,241,236);doc.rect(M,sy-6,W-M*2,8+rows.length*9,'F');
+    doc.setDrawColor(221,213,200);doc.rect(M,sy-6,W-M*2,8+rows.length*9);
+    doc.setTextColor(139,26,26);doc.setFontSize(8);doc.setFont('helvetica','bold');doc.text(title.toUpperCase(),M+4,sy);
+    let ry=sy+9;
+    rows.forEach(([l,v])=>{
+      doc.setTextColor(120,120,120);doc.setFont('helvetica','normal');doc.setFontSize(8);doc.text(l+':',M+4,ry);
+      doc.setTextColor(30,30,30);doc.setFont('helvetica','bold');doc.text(String(v||'—').substring(0,60),M+46,ry);ry+=9;
+    });
+    return ry+4;
+  };
+
+  doc.setFillColor(139,26,26);doc.roundedRect(M,y-5,52,10,3,3,'F');
+  doc.setTextColor(255,255,255);doc.setFontSize(9);doc.setFont('helvetica','bold');doc.text(`🏭 ${e.laboratory}`,M+3,y+1.5);
+  y+=12;
+
+  y=drawInfo('Datos de Entrega',[['Dirección',e.direccion],['Ciudad',e.ciudad],['Posible receptor',e.posibleReceptor],['Observaciones',e.observaciones||'—']],y);
+  y+=3;
+
+  doc.setFillColor(26,26,46);doc.rect(M,y,W-M*2,8,'F');
+  doc.setTextColor(255,255,255);doc.setFontSize(8);doc.setFont('helvetica','bold');doc.text('NUTRICIÓN ENTREGADA',M+4,y+5.5);y+=8;
+  e.products.forEach((p,i)=>{
+    doc.setFillColor(i%2===0?255:248,i%2===0?255:248,i%2===0?255:246);doc.rect(M,y,W-M*2,9,'F');
+    doc.setTextColor(30,30,30);doc.setFont('helvetica','normal');doc.setFontSize(9);doc.text(p.descripcion.substring(0,55),M+3,y+6);
+    doc.setFont('helvetica','bold');doc.setTextColor(139,26,26);doc.text(`${p.cantidad} ${p.unidad}`,W-M-3,y+6,{align:'right'});y+=9;
+  });
+  y+=4;
+
+  y=drawInfo('Datos del Entregador',[['Nombre',e.entregadorNombre||'—']],y);y+=3;
+  y=drawInfo('Datos del Receptor',[['Nombre',e.receptor],['Documento',e.documento],['Parentesco',e.parentesco||'—'],['Fecha entrega',fd(e.deliveredAt)]],y);
+  y+=6;
+
+  doc.setFillColor(244,241,236);doc.rect(M,y-4,W-M*2,54,'F');
+  doc.setDrawColor(221,213,200);doc.rect(M,y-4,W-M*2,54);
+  doc.setTextColor(139,26,26);doc.setFontSize(8);doc.setFont('helvetica','bold');doc.text('FIRMA DEL RECEPTOR',M+4,y+2);
+  if(e.signature){try{doc.addImage(e.signature,'PNG',M+10,y+6,78,34);}catch{}}
+  doc.setDrawColor(100,100,100);doc.line(M+10,y+42,M+88,y+42);
+  doc.setTextColor(100,100,100);doc.setFont('helvetica','normal');doc.setFontSize(7);
+  doc.text(`${e.receptor} — ${e.documento}`,M+10,y+47);
+
+  doc.setFillColor(26,26,46);doc.rect(0,285,W,12,'F');
+  doc.setTextColor(255,255,255);doc.setFontSize(7);
+  doc.text('GRUPO HELSE SAS — NIT 901401880-4 — Bogotá, D.C. — operaciones@helse.com.co',W/2,292,{align:'center'});
+
+  doc.save(`HELSE_${e.laboratory}_Entrega_${e.id}.pdf`);
+}
+
+// ─── HELPERS ───
+function pcHTML(e){
+  const m={pendiente:['y','y','⏳ PENDIENTE'],aceptado:['b','b',`🚚 ${e.entregadorNombre||'En camino'}`],entregado:['g','g','✅ ENTREGADO']};
+  const[tc,bc,bt]=m[e.status]||m.pendiente;
+  return`<div class="pcard"><div class="ptop ${tc}"><div class="pbadge ${bc}">${bt}</div><span class="labtag">🏭 ${e.laboratory}</span></div>
+  <div class="pbody"><div class="igrid">
+    <div><div class="ilbl">Dirección</div><div class="ival">${e.direccion}</div></div>
+    <div><div class="ilbl">Ciudad</div><div class="ival">${e.ciudad}</div></div>
+    <div><div class="ilbl">Receptor posible</div><div class="ival">${e.posibleReceptor}</div></div>
+    <div><div class="ilbl">Fecha</div><div class="ival" style="font-size:11px">${fd(e.createdAt)}</div></div>
+  </div>
+  <div class="pbox">${e.products.map(p=>`<div class="pi"><span>${p.descripcion}</span><span class="piq">${p.cantidad} ${p.unidad}</span></div>`).join('')}</div>
+  ${e.receptor?`<div style="font-size:12px;color:var(--green);font-weight:600">✅ Recibió: ${e.receptor} — ${e.documento}</div>`:''}
+  </div></div>`;
+}
+
+function empty(ico,txt,sub){return`<div class="empty"><div class="eico">${ico}</div><div style="font-size:14px;font-weight:500">${txt}</div><div style="font-size:12px;margin-top:4px">${sub}</div></div>`;}
+function fd(iso){if(!iso)return'—';try{return new Date(iso).toLocaleString('es-CO',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'});}catch{return iso;}}
+async function saveE(){await ss('helse-entregas',entregas);}
+function closeMo(id){document.getElementById(id).classList.remove('open');if(id==='mDelivery')curDel=null;}
+function toast(msg,type='ok'){const t=document.getElementById('toast');t.textContent=msg;t.className='toast '+type+' show';setTimeout(()=>t.classList.remove('show'),3500);}
+
+['mDelivery','mConfirm'].forEach(id=>document.getElementById(id).addEventListener('click',function(e){if(e.target===this)closeMo(id);}));
+</script>
 </body>
 </html>
