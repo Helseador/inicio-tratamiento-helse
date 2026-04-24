@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ErgoSalud - Evaluación de Riesgo</title>
+    <style>
+        /* =========================================
+           ESTILOS VISUALES (DISEÑO CON COLOR)
+           ========================================= */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        /* Fondo principal con degradado sutil */
+        body {
+            background: linear-gradient(135deg, #e0f7fa 0%, #e8eaf6 50%, #fce4ec 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        /* Cabecera con degradado fuerte */
+        .presentacion {
+            background: linear-gradient(135deg, #00b4d8, #0077b6);
+            color: white;
+            padding: 40px 20px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0, 119, 182, 0.3);
+        }
+
+        .presentacion h1 {
+            font-size: 2.8em;
+            margin-bottom: 20px;
+            color: #ffffff;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+            letter-spacing: 1px;
+        }
+
+        .info-proyecto {
+            background-color: rgba(255,255,255,0.15);
+            backdrop-filter: blur(5px);
+            padding: 25px;
+            border-radius: 15px;
+            text-align: left;
+            max-width: 900px;
+            margin: 0 auto;
+            line-height: 1.8;
+            border: 1px solid rgba(255,255,255,0.3);
+        }
+
+        .info-proyecto strong {
+            color: #90e0ef;
+        }
+
+        /* Contenedor principal (Tarjeta blanca) */
+        .app-container {
+            max-width: 850px;
+            margin: 40px auto;
+            background: #ffffff;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.08);
+            border-top: 6px solid #0077b6;
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #023e8a;
+            font-size: 1.8em;
+        }
+
+        /* Diseño de las preguntas */
+        .pregunta {
+            margin-bottom: 25px;
+            background: #f8f9fa;
+            padding: 20px;
+            border-left: 6px solid #00b4d8;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .pregunta:hover {
+            transform: translateX(8px);
+            box-shadow: 0 5px 15px rgba(0, 180, 216, 0.15);
+            background-color: #ffffff;
+        }
+
+        .pregunta label:first-child {
+            font-weight: bold;
+            display: block;
+            margin-bottom: 12px;
+            font-size: 1.1em;
+            color: #333;
+        }
+
+        /* Opciones (Radio buttons invisibles pero con color al pasar el mouse) */
+        .opciones label {
+            display: block;
+            margin-bottom: 8px;
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .opciones label:hover {
+            background-color: #e0f7fa;
+        }
+
+        /* Botón con degradado y efecto 3D */
+        button {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(90deg, #00b4d8, #023e8a);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.3em;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(2, 62, 138, 0.2);
+        }
+
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(2, 62, 138, 0.4);
+        }
+
+        button:active {
+            transform: translateY(1px);
+        }
+
+        /* Caja de resultados */
+        #resultado {
+            margin-top: 35px;
+            padding: 25px;
+            border-radius: 15px;
+            text-align: center;
+            transition: all 0.5s ease;
+        }
+
+        .oculto {
+            display: none;
+        }
+
+        #nivel-riesgo {
+            font-size: 1.8em;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        /* Colores vibrantes para los resultados */
+        .riesgo-bajo { 
+            background: linear-gradient(135deg, #d4edda, #c3e6cb); 
+            border: 2px solid #28a745; 
+            color: #155724;
+        }
+        .riesgo-medio { 
+            background: linear-gradient(135deg, #fff3cd, #ffeeba); 
+            border: 2px solid #ffc107; 
+            color: #856404;
+        }
+        .riesgo-alto { 
+            background: linear-gradient(135deg, #f8d7da, #f5c6cb); 
+            border: 2px solid #dc3545; 
+            color: #721c24;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- SECCIÓN DE PRESENTACIÓN -->
+    <header class="presentacion">
+        <h1>🏥 ErgoSalud App</h1>
+        <div class="info-proyecto">
+            <p><strong>Grupo:</strong> Unipersonal</p>
+            <p><strong>Integrante:</strong> Jose Zapata</p>
+            <p><strong>Carrera:</strong> Ingeniería Industrial (Enfoque en Salud Ocupacional)</p>
+            <p><strong>Objetivo:</strong> Proporcionar una herramienta interactiva y visual que permita identificar de manera preliminar los riesgos ergonómicos en puestos de trabajo, ayudando a prevenir enfermedades laborales.</p>
+            <p><strong>Instrucciones de uso:</strong> 1. Selecciona las condiciones de trabajo en el formulario. 2. Haz clic en "Evaluar Riesgo". 3. Observa el resultado visual y las recomendaciones generadas automáticamente.</p>
+        </div>
+    </header>
+
+    <!-- SECCIÓN DE LA APLICACIÓN INTERACTIVA -->
+    <main class="app-container">
+        <h2>🛠️ Evaluación Rápida de Puesto</h2>
+        <form id="formulario-ergonomia">
+            
+            <div class="pregunta">
+                <label>1. ¿Cuál es la postura principal de la espalda?</label>
+                <div class="opciones">
+                    <label><input type="radio" name="espalda" value="1"> Sentado con apoyo lumbar adecuado</label>
+                    <label><input type="radio" name="espalda" value="2"> De pie, pero con postura recta</label>
+                    <label><input type="radio" name="espalda" value="3"> Inclinado, torcido o flexionado frecuentemente</label>
+                </div>
+            </div>
+
+            <div class="pregunta">
+                <label>2. ¿Cómo son los movimientos de brazos y manos?</label>
+                <div class="opciones">
+                    <label><input type="radio" name="brazos" value="1"> Movimientos ligeros, codos cerca del cuerpo</label>
+                    <label><input type="radio" name="brazos" value="2"> Movimientos por encima de la cabeza o extendidos</label>
+                    <label><input type="radio" name="brazos" value="3"> Movimientos muy repetitivos o que exigen mucha fuerza</label>
+                </div>
+            </div>
+
+            <div class="pregunta">
+                <label>3. ¿Cuál es la carga física (peso) que se maneja?</label>
+                <div class="opciones">
+                    <label><input type="radio" name="carga" value="1"> Trabajo liviano (sin cargar peso)</label>
+                    <label><input type="radio" name="carga" value="2"> Carga ocasional o menor a 10 kg</label>
+                    <label><input type="radio" name="carga" value="3"> Carga pesada constante (más de 10 kg)</label>
+                </div>
+            </div>
+
+            <button type="button" id="btn-calcular">🚀 Evaluar Riesgo Ahora</button>
+        </form>
+
+        <!-- Aquí aparece el resultado -->
+        <div id="resultado" class="oculto">
+            <h3>📊 Resultado de la Evaluación:</h3>
+            <p id="nivel-riesgo"></p>
+            <p id="recomendacion"></p>
+        </div>
+
+    </main>
+
+    <!-- CÓDIGO JAVASCRIPT (INTERACTIVIDAD) -->
+    <script>
+        const botonCalcular = document.getElementById('btn-calcular');
+        const divResultado = document.getElementById('resultado');
+        const nivelRiesgo = document.getElementById('nivel-riesgo');
+        const recomendacion = document.getElementById('recomendacion');
+
+        botonCalcular.addEventListener('click', function() {
+            const espalda = document.querySelector('input[name="espalda"]:checked');
+            const brazos = document.querySelector('input[name="brazos"]:checked');
+            const carga = document.querySelector('input[name="carga"]:checked');
+
+            if (!espalda || !brazos || !carga) {
+                alert('⚠️ Por favor, responde todas las preguntas antes de evaluar.');
+                return;
+            }
+
+            let puntuacionTotal = parseInt(espalda.value) + parseInt(brazos.value) + parseInt(carga.value);
+
+            // Limpiar clases anteriores y mostrar
+            divResultado.classList.remove('oculto', 'riesgo-bajo', 'riesgo-medio', 'riesgo-alto');
+
+            if (puntuacionTotal <= 4) {
+                divResultado.classList.add('riesgo-bajo');
+                nivelRiesgo.textContent = '✅ Nivel de Riesgo: BAJO';
+                recomendacion.textContent = 'El puesto parece tener condiciones favorables. Mantenga estas buenas prácticas ergonómicas e implemente pausas activas.';
+            } else if (puntuacionTotal <= 7) {
+                divResultado.classList.add('riesgo-medio');
+                nivelRiesgo.textContent = '⚠️ Nivel de Riesgo: MEDIO';
+                recomendacion.textContent = 'Se requiere atención. Sugerencia: Mejore la estación de trabajo, ajuste la altura de sillas/mesas y reduzca la carga manipulada.';
+            } else {
+                divResultado.classList.add('riesgo-alto');
+                nivelRiesgo.textContent = '🚨 Nivel de Riesgo: ALTO';
+                recomendacion.textContent = '¡Peligro potencial para la salud del trabajador! Se requiere un rediseño inmediato del puesto, uso de ayudas mecánicas para carga y rotación de personal.';
+            }
+
+            // Hacer scroll suave hacia el resultado
+            divResultado.scrollIntoView({ behavior: 'smooth' });
+        });
+    </script>
+</body>
+</html>
